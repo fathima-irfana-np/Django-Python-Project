@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% block content %}
+
+<style>
+    .leftlinkpanel
+        {
+        padding:10px;
+        }
+    .leftlink
+        {
+        padding:5px;
+        border-bottom:1px solid #ccc;
+        }
+    a.active
+        {
+        font-weight: bold;
+        }
+    .productimage{
+            height: 300px !important;
+        }
+    </style>
+      
+    <div class="hero-area hero-bg"  style="height: 400px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 offset-lg-2 text-center">
+                    <div class="hero-text">
+                        <div class="hero-text-tablecell">
+                    <div class="breadcrumb-text">
+                        <h1>My Products</h1>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    
+            <section class="h-80 gradient-custom-2 " style="margin-top:80px;">
+                <div class="container py-5 h-100">
+                  <div class="row d-flex justify-content-center  h-100">
+                    <div class="col col-lg-4">
+                        <div class="card leftlinkpanel">
+                 
+                            <a href="/profile"  class=" {% if request.path == '/profile' %}active{% endif %} postporudtcs leftlink"> Profile</a>
+                            <a href="/password/{{log_det1.id}}"  class=" {% if request.path == '/password' %}active{% endif %} postporudtcs leftlink"> Change Password</a>
+                            <a href="/postproduct"  class=" {% if request.path == '/postproduct' %}active{% endif %} postporudtcs leftlink">Post Products</a>
+                                <a href="/update" class="  {% if request.path == '/update' %}active{% endif %} postporudtcs leftlink">Edit Profile</a>
+                            <a href="/myproducts/{{user.id}}" class="  {% if request.path == '/myproducts' %}active{% endif %} myproducts leftlink">My products</a>
+                 
+                        </div>
+                       </div>
+                    <div class="col-md-8 ">
+                        <div class="row product-lists" id="product-lists">
+                            {% for product in products %}
+                            <div class="col-md-6 text-center" data-image-id="{{ product.id }}">
+                                <div class="single-product-item">
+                                    <div class="product-image">
+                                        <a href="{% url 'singleproduct' product.id %}"> <img src="{{product.image.url}}" alt="" class="productimage" ></a>
+                                    </div>
+                                    <h3>{{product.name}}</h3>
+                                    <p class="product-price"><span>{{product.price}}₹</span></p> 
+                                    
+                                    
+                                    <form method="post" class="delete-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                                        <a href="{% url 'editproduct' product.id  %}" class="cart-btn">Edit</a>
+                                        <a class="cart-btn" onclick="deleteProduct({{ product.id }})">Delete</a>
+                                    </form>{% csrf_token %}    
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                        <div id="popupsucess" class="alert alert-success successbox" style="display: none;">
+                            Product Deleted sucessfully
+                        </div>
+                  </div>
+                </div>
+              </section>
+    
+    
+    
+    
+    <!-- end products -->
+    
+    <!-- logo carousel -->
+    <div class="logo-carousel-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="logo-carousel-inner">
+                        {% for x in endlogo %}
+                        <div class="single-logo-item">
+                            <img src="{{x.image.url}}" alt="">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <script>
+        function deleteProduct(productid) {
+              $.ajax({
+                  type: 'POST',
+                  url: '/delete_product/',
+                  data: { 'product_id': productid, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+                  success: function (data) {
+                      if (data.success) {
+                          // Remove the deleted image container
+                          $('div[data-image-id="' + productid + '"]').remove();
+                          $('#popupsucess').show();
+                          
+                      } else {
+                          console.log('Error:', data.error_message);
+                          
+                      }
+                      setTimeout(function() {
+                        $('#popupsucess').hide();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 a
+                    }, 3000);
+                  },
+                  error: function (error) {
+                      console.log(error);
+                  }
+                  
+              });
+          }
+    
+    </script>
+    
+    
+    {%endblock%}

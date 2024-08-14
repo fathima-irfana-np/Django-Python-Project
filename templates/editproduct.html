@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% block content %}
+
+<style>
+.leftlinkpanel
+{
+padding:10px;
+}
+.leftlink
+{
+padding:5px;
+border-bottom:1px solid #ccc;
+}
+a.active
+{
+font-weight: bold;
+}
+b{
+  font-size: x-large;
+}
+span{
+ 
+  margin-left: 20px!important;
+  font-size: large!important;
+}
+</style>
+<div class="hero-area hero-bg" style="height: 400px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-9 offset-lg-2 text-center">
+        <div class="hero-text">
+          <div class="hero-text-tablecell">
+							<h1>Edit Product</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="h-80 gradient-custom-2 " style="margin-top:80px;">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center  h-100">
+	  <div class="col col-lg-4 col-xl-4">
+	   <div class="card leftlinkpanel">
+
+	    <a href="/profile"  class=" {% if request.path == '/profile' %}active{% endif %} postporudtcs leftlink"> Profile</a>
+      <a href="/password/{{log_det1.id}}"  class=" {% if request.path == '/password' %}active{% endif %} postporudtcs leftlink"> Change Password</a>
+      <a href="postproduct"  class=" {% if request.path == '/postproduct' %}active{% endif %} postporudtcs leftlink">Post Products</a>
+		  <a href="/update" class="  {% if request.path == '/update' %}active{% endif %} postporudtcs leftlink">Edit Profile</a>
+      <a href="/myproducts/{{log_det1.id}}" class="  {% if request.path == '/myproducts' %}active{% endif %} myproducts leftlink">My products</a>
+
+	   </div>
+	  </div>
+    <div class="col-8 col-md-8 col-lg-8 col-xl-8" style="margin-bottom: 50px; margin-top: 50px;border-style: solid;border-width: 2px;border-color: rgba(250, 250, 250, 0.879);border-radius: 10px;">
+      <!-- <div class="col-8 col-md-8 col-lg-8 col-xl-8" style="margin-bottom: 50px; margin-top: 50px"> -->
+        <h3 class="text-uppercase text-center mb-3">Manage Product</h3>
+        <form method='post' enctype="multipart/form-data" style="margin-bottom: 50px;" id="productedit-form">
+          {% csrf_token %}
+          <div class="form-outline mb-4">
+            <label class="form-label" for="Catagory">Product Catagory:</label>
+            <select name="product_category" class="form-control form-control-lg" required>
+              <option value=" {{products.productcategory_id}} "> {{products.productcategory}} </option>
+              {% for product_category in all_product %}
+              <option value="{{ product_category.id }}">{{ product_category.title }}</option>
+              {% endfor %}
+            </select>
+            
+          </div>
+
+          <div class="form-outline mb-4">
+            <input type="hidden" id="form3Example3cg" name="product_id" class="form-control form-control-lg" value='{{products.id}}' required>
+            <label class="form-label" for="title">Product Name:</label>
+            <input type="text" id="form3Example3cg" name="title" class="form-control form-control-lg" placeholder="" value='{{products.name}}' required>
+            
+          </div>
+
+          <div class="form-outline mb-4">
+            <label class="form-label" for="price">Product Price:</label>
+            <input type="text" name="price" placeholder="" class="form-control form-control-lg" value='{{products.price}}' style="width: 724px;"  required>
+            
+          </div>
+          <div class="form-outline mb-4">
+            <label class="form-label" for="Description">Description:</label>
+            <textarea name="description" class="form-control form-control-lg" placeholder="">{{products.description}}</textarea>
+            
+          </div>
+          <div class="form-outline mb-6">
+            <label class="form-label" for="Image"><b>Product Image:</b></label><br>
+            <img id='prd-image' src="{{products.image.url}}" width='300px' height='300px'><br><br>
+            
+            <input type="file" id="prdimg" class="form-control form-control-lg" name="Image" />
+
+          </div><br><br>
+
+          <label class="form-label" for="Image"><b>Multiple Image:</b></label>
+          <div class="imgview row">
+            {% for image_multi in multi_img %}
+              <div class='col-md-4' data-image-id="{{ image_multi.id }}" >
+                <img style='width: 300px; height: 300px;' class='imgsize' src='{{ image_multi.image.url }}' />
+                <input type='hidden' name='newsfeedsmultipleimg[]' value='" + data.name + "' id='hidden_image'  />
+                <i class=''  onclick='deleteImage({{ image_multi.id }})' style='cursor: pointer;border-style: solid;border-color: black;color: black;width: 100px; height: 20px;'>delete</i>
+              </div>
+            {% endfor %}
+          </div><br><br>
+          <div id="popupdelete" style="display: none;text-align: center;font-size: large;height:50px">
+            Image Deleted Successfully
+         </div>
+
+
+          <div class="form-outline mb-4">
+            <label class="label-class1" style="margin-left: 20px;">Upload multi-image choose only(jpg, jpeg, webp, png):</label>
+            <input class="form-control" type="file" name="images" multiple id="multi_upload_namrce" ><br>
+          </div>
+
+          <div class="col-sm-12"><br><br>
+            <button type="submit" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Post Product</button>
+          </div>
+          <br>
+          <div id="popupupdate" style="display: none;text-align: center;font-size: large;height:50px">
+            Product updated successfully
+          </div>
+          
+          
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+
+    
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script></script>
+<script type="text/javascript">
+$('#productedit-form').on('submit', function (event) {
+event.preventDefault();
+var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+var formData = new FormData(this);
+$.ajax({
+    type: 'POST',
+    url: '/editproduct/',
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+        $('#popupupdate').show();
+        setTimeout(function () {
+            $('#popupupdate').hide();
+        }, 4000);
+    },
+    error: function (response) {
+        // Handle error
+    }
+});
+});
+
+
+$('#prdimg').on('change', function () {
+var input = this;
+
+if (input.files && input.files[0]) {
+  var reader = new FileReader();
+
+  reader.onload = function (e) {
+    // Update the preview image src attribute
+    $('#prd-image').attr('src', e.target.result);
+  };
+
+  reader.readAsDataURL(input.files[0]);
+}
+});
+
+
+$(document).ready(function () {
+$(document).on('change', '#multi_upload_namrce', function (event) {
+    event.preventDefault();
+
+    var fileInput = $(this);
+    var files = fileInput[0].files;
+    var fd = new FormData(); 
+    var product_id = $('input[name="product_id"]').val();  
+
+    fd.append('product_id', product_id); 
+
+    $.each(files, function (i, file) {
+        fd.append('image', file);
+    });
+    
+    var csrfToken = $('[name=csrfmiddlewaretoken]').val()
+    fd.append('csrfmiddlewaretoken', csrfToken);
+
+    $.ajax({
+        url: '/upload_multi_image/',
+        type: 'POST',
+        data: fd,
+        dataType: 'json',
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            console.log(data);
+            $('.imgview').append("<div class='col-md-4' data-image-id=" + data.image_id + " ><img style='width: 300px; height: 300px;' class='imgsize' src='" + data.url + "' /><input type='hidden' name='newsfeedsmultipleimg[]' value='" + data.name + "' id='hidden_image'  /><i class=''  onclick='deleteImage(" + data.image_id + ")' style='cursor: pointer;border-style: solid;border-color: black;color: black;width: 100px; height: 20px;'>delete</i></div>");
+         
+        },
+    });
+});
+});
+
+</script>
+<script>
+function deleteImage(imageId) {
+    $.ajax({
+        type: 'POST',
+        url: '/delete_image/',
+        data: { 'image_id': imageId, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+        success: function (data) {
+            if (data.success) {
+                // Remove the deleted image container
+                $('div[data-image-id="' + imageId + '"]').remove();
+                $('#popupdelete').show();
+                setTimeout(function () {
+                    $('#popupdelete').hide();
+                }, 2000);
+            } else {
+                console.log('Error:', data.error_message);
+            }
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+}
+
+</script>
+
+{%endblock %}

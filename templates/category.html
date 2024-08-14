@@ -1,0 +1,186 @@
+{%extends 'base.html'%}
+
+{% load static%}
+{% block title%} Category{%endblock%}
+
+{%block content%}
+<style>
+    .dropdown-select {
+      padding: 8px;
+      font-size: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      cursor: pointer;
+      
+    }
+  
+    /* Optional: Style for the dropdown arrow */
+    .dropdown-select::after {
+      content: "\25BC"; /* Unicode character for down arrow */
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  </style>
+
+    <!-- breadcrumb-section -->
+    <div class="hero-area hero-bg" style="height: 400px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-9 offset-lg-2 text-center">
+                    <div class="hero-text">
+                        <div class="hero-text-tablecell">
+                            <div class="breadcrumb-text">
+                                <h1 style="text-transform: uppercase;"> {{ cateogry.title }} </h1>
+                                {% for x in shophead %}
+                                    <p>{{ x.job_title }}</p>
+                                    
+                                {% endfor %}
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end breadcrumb section -->
+
+    <!-- products -->
+    <section>
+        <div class="product-section mt-150 mb-150">
+            <div class="container">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="dropdown" style="width:300px;background-color: aquamarine;">
+                          <select onchange="redirectToCategory(this.value)" style="width:340px;height: 30px;font-size: larger;text-transform: uppercase;">
+                            <option value="#">{{ cateogry.title }} </option>
+                            <option value="{% url 'product' %}">ALL product category</option>
+                            {% for categorys in productcategory %}
+                              <option value="{% url 'singlecategory' categorys.id %}">{{ categorys.title }}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                    </div>
+                      
+                    <script>
+                        function redirectToCategory(url) {
+                        window.location.href = url;
+                        }
+                    </script>
+                    
+                    <div class="col-md-10" style="margin-left: 420px;margin-top: -30px;">
+                        <div class="product-filters">
+                            <ul>
+                                <form id="Product_search" method="get" class="job-main-form">
+                                    {% csrf_token %}
+                                    <div class="controls">
+                                        <div class="row align-items-end">
+                                            <div class="col-sm-12"></div>
+                                            <div class="col-sm-13 col-lg-8 form-group">
+                                                <input type="hidden"  name="cateogry_id" value="{{cateogry.id}}">
+                                                <input type="text" id="productname" name="productname"
+                                                    placeholder="Search Your Product:" class="form-control">
+                                            </div>
+                                            <div class="col-sm-1 form-group">
+                                                <button type="submit" style="background-color: rgb(255, 87, 26);" class="btn btn-outline-white-primary job-main-form__button">
+                                                    <i class="fa fa-search" ></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row product-lists" id="product-lists">
+                    {% for product in products %}
+						<div class="col-lg-4 col-md-6 text-center {{product.product_catgeory_id}}">
+                        {% comment %} <div class="col-lg-4 col-md-6 text-center {{ product.product_category }}"> {% endcomment %}
+                            <div class="single-product-item">
+                                <div class="product-image">
+                                    <a href="{% url 'single_product' product.id %}">
+                                        <img src="{{ product.image.url }}" alt="" style="width: 200px; height: 200px;">
+                                    </a>
+                                </div>
+                                <h3>{{ product.name}}</h3>
+                                <p class="product-price">₹{{ product.price }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end products -->
+
+    <!-- logo carousel -->
+    <div class="logo-carousel-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="logo-carousel-inner">
+                        {% for x in endlogo %}
+                            <div class="single-logo-item">
+                                <img src="{{ x.image.url }}" alt="">
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end logo carousel -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#Product_search').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'product_cateogry_search_ajax' %}",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        var results = response.results;
+                        console.log(results);
+
+                        var resultsHtml = '';
+                        var length = results.length;
+                        console.log(length);
+                        for (var i = 0; i < length; i++) {
+                            var singleProductURL = "{% url 'single_product' 0 %}".replace('0', results[i].id);
+                            resultsHtml += `<div class="col-lg-4 col-md-6 text-center ${results[i].catgeory} ">
+                                                <div class="single-product-item">
+                                                    <div class="product-image">
+                                                        <a href="${singleProductURL}">
+                                                            <img src="${results[i].image}" alt="" style="width: 200px; height: 200px;">
+                                                        </a>
+                                                    </div>
+                                                    <h3>${results[i].title}</h3>
+                                                    <p class="product-price">
+                                                        <span>${results[i].price}₹</span>
+                                                    </p>
+                                                </div>
+                                            </div>`;
+                            $('#product-lists').html(resultsHtml);
+                        }
+                        if (resultsHtml === '') {
+                            resultsHtml = '<div class="col-lg-12" >No products found.</div>';
+                        }
+    
+                        $('#product-lists').html(resultsHtml);
+                    },
+                    error: function (error) {
+                        console.error("Error fetching search results:", error);
+                        $('#product-lists').html('<div class="col-lg-12">Error fetching search results. Please try again.</div>');
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

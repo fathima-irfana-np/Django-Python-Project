@@ -1,0 +1,93 @@
+{%extends 'base.html'%}
+
+{% load static%}
+{% block title%} Profile{%endblock%}
+
+{%block content%}
+
+<style>
+.leftlinkpanel
+{
+padding:10px;
+}
+.leftlink
+{
+padding:5px;
+border-bottom:1px solid #ccc;
+}
+a.active
+{
+font-weight: bold;
+}
+b{
+  font-size: large;
+}
+span{
+ 
+  margin-left: 20px!important;
+  font-size: large!important;
+}
+</style>
+<div class="hero-area hero-bg" style="height: 400px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-9 offset-lg-2 text-center">
+        <div class="hero-text">
+          <div class="hero-text-tablecell">
+							<h1>Profile</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="h-80 gradient-custom-2 " style="margin-top:80px;">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center  h-100">
+	  <div class="col col-lg-4 col-xl-4">
+	   <div class="card leftlinkpanel">
+
+	    <a href="/profile"  class=" {% if request.path == '/profile' %}active{% endif %} postporudtcs leftlink"> Profile</a>
+      <a href="changepassword/{{user.id}}"  class=" {% if request.path == 'changepassword' %}active{% endif %} postporudtcs leftlink"> Change Password</a>
+      <a href="postproduct"  class=" {% if request.path == '/postproduct' %}active{% endif %} postporudtcs leftlink">Post Products</a>
+		  <a href="/editprofile" class="  {% if request.path == '/update' %}active{% endif %} postporudtcs leftlink">Edit Profile</a>
+      <a href="/myproducts/{{user.id}}" class="  {% if request.path == '/myproducts' %}active{% endif %} myproducts leftlink">My products</a>
+
+	   </div>
+	  </div>
+        <div class="col col-lg-8 col-xl-8">
+          <div class="card">
+            <div class="rounded-top text-white d-flex flex-row" style="background-color:grey; height:200px;">
+              <div class="ms-4 mt-1 mb-4 d-flex flex-column" style="width: 150px;">
+                <img src="{{profile.image.url}}"
+                  alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2 ml-3"
+                  style="width: 150px; height:150px; z-index: 1">
+              </div>
+              <div class="ms-5 mb-3" style="margin-top: 80px; margin-left:25px">
+                <h3 style="color:white">{{user.username}}</h3>
+                <p style="color:white">{{profile.email}}</p>
+              </div>
+            </div>
+            <div class="p-4 text-black" >
+              
+              <div class="card-body p-4 text-black">
+                {% comment %} <div class="mb-5"> {% endcomment %}
+                  <p style="font-size: large;" class="lead fw-normal mb-1">About</p>
+                  <div class="p-4"  >
+                    <p class="text-bold sans-serif"><b >Name&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:</b><span>{{profile.name}}</span></p>
+                    <p class="text-bold sans-serif"><b >Address&nbsp&nbsp:</b><span>{{profile.address}}</span> </p>
+                 
+                   <p class="text-bold sans-serif"><b>Email&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:</b><span> {{profile.email}}</span>   </p> 
+                    <p class="text-bold sans-serif"><b>Place&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp:</b><span>{{profile.place}}</span>     </p>
+                    <p class="text-bold sans-serif"><b>Contact&nbsp&nbsp&nbsp:</b><span>{{profile.phonenumber}} </span>    </p>
+                  </div>
+                <a href="{% url 'logout' %}"><button type="button" class="btn btn-outline-dark m-4" data-mdb-ripple-color="dark" style="height: 40px;width: 150px;font-size: large;">Logout</a>
+                </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+  {% endblock %}

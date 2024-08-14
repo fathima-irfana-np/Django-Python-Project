@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% block content %}
+
+<style>
+.leftlinkpanel
+{
+padding:10px;
+}
+.leftlink
+{
+padding:5px;
+border-bottom:1px solid #ccc;
+}
+a.active
+{
+font-weight: bold;
+}
+b{
+  font-size: x-large;
+}
+span{
+ 
+  margin-left: 20px!important;
+  font-size: large!important;
+}
+</style>
+<div class="hero-area hero-bg" style="height: 400px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-9 offset-lg-2 text-center">
+        <div class="hero-text">
+          <div class="hero-text-tablecell">
+							<h1>AddProduct</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="h-80 gradient-custom-2 " style="margin-top:80px;">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center  h-100">
+	  <div class="col col-lg-4 col-xl-4">
+	   <div class="card leftlinkpanel">
+
+	    <a href="/profile"  class=" {% if request.path == '/profile' %}active{% endif %} postporudtcs leftlink"> Profile</a>
+      <a href="/password/{{log_det1.id}}"  class=" {% if request.path == '/password' %}active{% endif %} postporudtcs leftlink"> Change Password</a>
+      <a href="postproduct"  class=" {% if request.path == '/postproduct' %}active{% endif %} postporudtcs leftlink">Post Products</a>
+		  <a href="/update" class="  {% if request.path == '/update' %}active{% endif %} postporudtcs leftlink">Edit Profile</a>
+      <a href="/myproducts/{{user.id}}" class="  {% if request.path == '/myproducts' %}active{% endif %} myproducts leftlink">My products</a>
+
+	   </div>
+	  </div>
+      <div class="col-8 col-md-8 col-lg-8 col-xl-8" style="margin-bottom: 50px; margin-top: 2px;">
+        <div class="card" style="padding: 20px;">
+          <h3 class="text-uppercase text-center mb-3">Add Product</h3>
+          <form method="post" enctype="multipart/form-data" style="margin-bottom: 50px;" id="product-form">
+            {% csrf_token %}
+            <div class="form-outline mb-4">
+              <select name="product_catgeory" class="form-control form-control-lg" required>
+                <option value="">Select Category</option>
+                {% for product in all_product %}
+                <option value="{{ product.id }}">{{ product.title }}</option>
+                {% endfor %}
+              </select>
+              <label class="form-label" for="Catagory"></label>
+            </div>
+
+            <div class="form-outline mb-4">
+              <input type="text" id="form3Example3cg" name="title" class="form-control form-control-lg" placeholder="Product Name" required>
+              <label class="form-label" for="title"></label>
+            </div>
+
+            <div class="form-outline mb-4">
+              <input type="text" name="price" placeholder="Product Price" class="form-control form-control-lg"step="0.00" style="width: 690px;" required>
+              <label class="form-label" for="price"></label>
+            </div>
+
+            <div class="form-outline mb-4">
+              <textarea name="Description" class="form-control form-control-lg" placeholder="Description" required ></textarea>
+              <label class="form-label" for="Description"></label>
+            </div>
+
+            <div class="form-outline mb-4">
+              <label class="form-label" for="image"><b>Product Image</b></label>
+              <img id="product-image" src="" alt="Preview Image" style="width: 300px; height: 300px; display: none;">
+              <input id="productimage" type="file" class="form-control form-control-lg" name="productimage" required />
+            </div>
+
+            <div class="form-outline mb-4">
+              <label class="label-class1" style="margin-left: 20px;">Upload multi-image choose only(jpg, jpeg, webp, png):</label>
+              <input class="form-control form-control-lg" type="file" name="images" multiple id="multi_upload_namrce" ><br>
+            </div>
+
+            <div class="imgview row" id="imgview">
+              <!-- Images will be displayed here -->
+            </div><br><br>
+
+            <div id="popupsucess" class="alert alert-success successbox" style="display: none;">
+              Product added successfully
+            </div>
+
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Post Product</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$('#product-form').on('submit', function (event) {
+  event.preventDefault();
+
+  var formData = new FormData(this);
+  var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+  formData.append('csrfmiddlewaretoken', csrfToken);
+
+  $.ajax({
+    type: 'POST',
+    url: 'postproduct',
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      $('#popupsucess').show();
+
+      setTimeout(function () {
+        $('#product-image').hide();
+        $('#popupsucess').hide();
+        $('#product-form')[0].reset();
+        $('.imgview').empty(); // Reset image preview
+      }, 3000);
+    },
+    error: function (response) {
+      $('#product_added').text(response.responseJSON.error);
+    }
+  });
+});
+
+$(document).ready(function () {
+  $(document).on('change', '#multi_upload_namrce', function (event) {
+    event.preventDefault();
+
+    var fileInput = $(this);
+    var files = fileInput[0].files;
+    var fd = new FormData();
+
+    $.each(files, function (i, file) {
+      fd.append('image', file);
+    });
+
+    var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+    fd.append('csrfmiddlewaretoken', csrfToken);
+
+    $.ajax({
+      url: '/upload_image/',
+      type: 'POST',
+      data: fd,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      success: function (data) {
+        console.log(data);
+        $('.imgview').append("<div class='col-md-4' data-image-id=" + data.image_id + " ><img style='width: 300px; height: 300px;' class='imgsize' src='" + data.url + "' /><input type='hidden' name='newsfeedsmultipleimg[]' value='" + data.name + "' id='hidden_image'  /><i class=''  onclick='deleteImage(" + data.image_id + ")' style='cursor: pointer;border-style: solid;border-color: black;color: black;width: 100px; height: 20px;'>delete</i></div>");
+      },
+    });
+  });
+});
+
+document.getElementById('productimage').addEventListener('change', function () {
+  var input = this;
+
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      // Update the preview image src attribute
+      document.getElementById('product-image').src = e.target.result;
+      // Show the image
+      document.getElementById('product-image').style.display = 'block';
+    };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+});
+
+function deleteImage(imageId) {
+  $.ajax({
+    type: 'POST',
+    url: '/delete_image/',
+    data: { 'image_id': imageId, 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+    success: function (data) {
+      if (data.success) {
+        // Remove the deleted image container
+        $('div[data-image-id="' + imageId + '"]').remove();
+      } else {
+        console.log('Error:', data.error_message);
+      }
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  });
+}
+</script>
+      {% endblock %}

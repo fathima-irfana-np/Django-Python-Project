@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% block content %}
+
+
+<style>
+.leftlinkpanel
+{
+padding:10px;
+}
+.leftlink
+{
+padding:5px;
+border-bottom:1px solid #ccc;
+}
+a.active
+{
+font-weight: bold;
+}
+</style>
+<div class="hero-area hero-bg" style="height: 400px;">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-9 offset-lg-2 text-center">
+        <div class="hero-text">
+          <div class="hero-text-tablecell">
+            <h1>Update</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="h-80 gradient-custom-2 " style="margin-top:80px;">
+  <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center  h-100">
+          <div class="col col-lg-4 col-xl-4">
+              <div class="card leftlinkpanel">
+                  <a href="/profile"  class=" {% if request.path == '/profile' %}active{% endif %} postporudtcs leftlink"> Profile</a>
+                  <a href="/change_password{{log_det1.id}}"  class=" {% if request.path == '/password/{{log_det1.id}}' %}active{% endif %} postporudtcs leftlink"> Change Password</a>
+                  <a href="/addproduct"  class=" {% if request.path == '/addproduct' %}active{% endif %} postporudtcs leftlink">Post Products</a>
+                  <a href="/update" class="  {% if request.path == '/update' %}active{% endif %} postporudtcs leftlink">Edit Profile</a>
+                  <a href="/myproducts/{{log_det1.id}}" class="  {% if request.path == '/myproducts' %}active{% endif %} myproducts leftlink">My products</a>
+              </div>
+          </div>
+          <div class="col col-lg-8 col-xl-8">
+              <div class="card">
+                  <div class="card-body">
+                      <p  style="font-size:30px;text-decoration: underline;">UPDATE PROFILE</p><br>
+                      <form class="mx-1 mx-md-4" method="POST" enctype="multipart/form-data" id="update-form">
+                        {% csrf_token %}
+
+                          {% comment %} <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="form3Example1c">Username:</label>
+                              <input type="text" id="form3Example1c" class="form-control" placeholder="" name="username" value="{{log_det1.username}}" >
+                            </div>
+                            </div> {% endcomment %}
+
+                            <div class="d-flex flex-row align-items-center mb-4">
+                          <div class="form-outline flex-fill mb-0">
+                            <label class="form-label" for="form3Example1c">Name:</label>
+                            <input type="text" id="form3Example1c" class="form-control" placeholder="" name="name" value="{{log_det2.name}}" >
+                          </div></div>
+                        
+
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="form3Example3c">Email:</label>
+                              <input type="email" id="form3Example3c" class="form-control" placeholder="" name="email"  value="{{log_det2.email}}" >
+                              
+                            </div>
+                          </div>
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="form3Example3c">Phone number:</label>
+                              <input type="tel" id="form3Example3c" class="form-control" placeholder="" name="phonenumber" value="{{log_det2.phonenumber}}" >
+                              
+                            </div>
+                          </div>
+                          
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="pic">Profile picture:</label><br>
+                              <img id="profile-images" src="{{log_det2.image.url}}" style="height:300px;width:300px;">
+                              <input id="updateimage" type="file"  class="form-control" placeholder="Image" name="image">
+                            </div>
+                          </div> 
+                                      
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="form3Example3c">Address:</label>
+                              {% comment %} <input type="text" id="form3Example3c" class="form-control" placeholder="" name="address" value="{{log_det2.address}}" > {% endcomment %}
+                              <textarea type="text" id="form3Example3c" class="form-control" placeholder="" name="address"  value="" >{{log_det2.address}}</textarea>
+                            </div>
+                          </div>
+                          <div class="d-flex flex-row align-items-center mb-4">
+                            <div class="form-outline flex-fill mb-0">
+                              <label class="form-label" for="form3Example3c">Place:</label>
+                              <input type="text" id="form3Example3c" class="form-control" placeholder="" name="place" value="{{log_det2.place}}" >
+                              {% comment %} <input  id="form3Example3c" class="form-control" placeholder="" name="userid" type="hidden" value="{{log_det1.id}}" > {% endcomment %}
+                              
+                            </div>
+                          </div>
+                        
+                          </div>
+                        
+                          </div>   
+                            <button type="submit" class="btn btn-primary btn-lg" style="width:650px;">Update</button>
+                          
+                        
+                      </form>
+                      <br>
+                      <div class="alert alert-success" role="alert"id="success" style="display:none;">
+                        User Registerd Successfully
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$('#update-form').on('submit', function(event) {
+  event.preventDefault();
+var csrfToken = $('[name=csrfmiddlewaretoken]').val();
+var formData = new FormData(this); // convert form to array
+   $.ajax({
+    type: 'POST',
+    url: '/editprofile',
+    data: formData,
+    processData: false,
+    contentType: false,
+      success: function(response) {
+        $('#success').show();
+          
+            setTimeout(function() {
+                $('#success').hide();
+                $('#registration-form')[0].reset();
+            }, 3000);
+                    
+          
+      },
+      error: function(response) {
+       
+      }
+  });
+});
+$('#updateimage').on('change', function () {
+  var input = this;
+
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      console.log(e)
+      // Update the preview image src attribute
+      $('#profile-images').attr('src', e.target.result);
+    };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+});
+</script>
+{% endblock %}
